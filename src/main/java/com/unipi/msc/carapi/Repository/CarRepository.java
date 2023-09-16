@@ -17,7 +17,7 @@ import static com.unipi.msc.carapi.Response.ErrorMessages.CAR_NOT_FOUND;
 public class CarRepository implements ICar {
     private Connection con;
 
-    public CarRepository() {
+    private void establishConnection(){
         try {
             con = DriverManager.getConnection("jdbc:mysql://localhost:3306/carapi","root","root");
         } catch (SQLException e) {
@@ -30,6 +30,7 @@ public class CarRepository implements ICar {
         List<Car> carList = new ArrayList<>();
         Statement stmt;
         try {
+            establishConnection();
             stmt = con.createStatement();
             ResultSet rs=stmt.executeQuery("SELECT * FROM car");
             while(rs.next()) {
@@ -47,6 +48,7 @@ public class CarRepository implements ICar {
         Car car = null;
         Statement stmt;
         try {
+            establishConnection();
             stmt = con.createStatement();
             ResultSet rs=stmt.executeQuery("SELECT * FROM car WHERE id = "+id);
             if (rs.next()){
@@ -64,22 +66,19 @@ public class CarRepository implements ICar {
 
     @Override
     public ResponseEntity createCar(CarRequest request) {
-        boolean rs;
         Statement stmt;
         try {
+            establishConnection();
             stmt = con.createStatement();
             String query = """
                 INSERT INTO car (model, price) VALUES ( "{MODEL}" , {PRICE} )
             """;
             query = query.replace("{MODEL}", request.getModel())
                          .replace("{PRICE}", String.valueOf(request.getPrice()));
-            rs=stmt.execute(query);
+            stmt.execute(query);
             con.close();
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(ErrorResponse.builder().errorMessage(e.getMessage()).build());
-        }
-        if (!rs){
-            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
     }
@@ -89,11 +88,12 @@ public class CarRepository implements ICar {
         boolean rs;
         Statement stmt;
         try {
+            establishConnection();
             stmt = con.createStatement();
             String query = """
                 UPDATE car SET model = "{MODEL}", price = {PRICE} WHERE id = {ID}
             """;
-            query = query.replace("{MODEL}", String.valueOf(id))
+            query = query.replace("{ID}", String.valueOf(id))
                          .replace("{MODEL}", request.getModel())
                          .replace("{PRICE}", String.valueOf(request.getPrice()));
             rs=stmt.execute(query);
@@ -109,21 +109,18 @@ public class CarRepository implements ICar {
 
     @Override
     public ResponseEntity deleteCar(int id) {
-        boolean rs;
         Statement stmt;
         try {
+            establishConnection();
             stmt = con.createStatement();
             String query = """
                 DELETE FROM CAR WHERE ID = {ID}
             """;
             query = query.replace("{ID}", String.valueOf(id));
-            rs=stmt.execute(query);
+            stmt.execute(query);
             con.close();
         }catch (Exception e){
             return ResponseEntity.internalServerError().body(ErrorResponse.builder().errorMessage(e.getMessage()).build());
-        }
-        if (!rs){
-            return ResponseEntity.badRequest().build();
         }
         return ResponseEntity.ok().build();
     }
