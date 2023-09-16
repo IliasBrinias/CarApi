@@ -19,7 +19,7 @@ public class CarRepository implements ICar {
 
     private void establishConnection(){
         try {
-            con = DriverManager.getConnection("jdbc:mysql://localhost:3306/carapi","root","root");
+            con = DriverManager.getConnection("jdbc:mysql://host.docker.internal:3306/carapi","root","root");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
