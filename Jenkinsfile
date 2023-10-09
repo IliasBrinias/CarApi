@@ -27,7 +27,7 @@ pipeline {
                     sh '''
                         mvn clean verify sonar:sonar \
                           -Dsonar.projectKey=SchoolAPI \
-                          -Dsonar.host.url=https://8668-109-178-143-5.ngrok-free.app \
+                          -Dsonar.host.url=http://hungry_solomon:8000\
                           -Dsonar.login=sqp_a6a4c1f157c8b472314e424c94c98eef7513b6de
                     '''
                 }
